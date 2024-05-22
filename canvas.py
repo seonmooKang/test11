@@ -1,29 +1,36 @@
 import streamlit as st
-from streamlit_drawable_canvas import st_canvas
-from PIL import Image
+import os
 
-st.title("Drawing App")
+# 파일 경로 설정
+notes_file = "notes.txt"
 
-st.sidebar.header("Configuration")
-stroke_width = st.sidebar.slider("Stroke width", 1, 25, 3)
-stroke_color = st.sidebar.color_picker("Stroke color", "#000000")
-bg_color = st.sidebar.color_picker("Background color", "#FFFFFF")
-bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
+# 메모 저장 함수
+def save_note(note):
+    with open(notes_file, 'a') as f:
+        f.write(note + "\n")
 
-# Set up the canvas
-canvas_result = st_canvas(
-    fill_color="rgba(255, 255, 255, 0.3)",  # Fixed fill color with some opacity
-    stroke_width=stroke_width,
-    stroke_color=stroke_color,
-    background_color=bg_color if not bg_image else None,
-    background_image=Image.open(bg_image) if bg_image else None,
-    update_streamlit=True,
-    height=500,
-    width=700,
-    drawing_mode="freedraw",
-    key="canvas",
-)
+# 메모 불러오기 함수
+def load_notes():
+    if os.path.exists(notes_file):
+        with open(notes_file, 'r') as f:
+            notes = f.readlines()
+    else:
+        notes = []
+    return notes
 
-# Display the image data after drawing
-if canvas_result.image_data is not None:
-    st.image(canvas_result.image_data, caption="Your Drawing")
+# Streamlit 앱 설정
+st.title("Notepad")
+
+# 사용자 입력 받기
+note = st.text_area("Write your note here...", height=150)
+
+if st.button("Save Note"):
+    save_note(note)
+    st.success("Note saved!")
+
+# 저장된 메모 불러오기
+notes = load_notes()
+
+st.subheader("Notes")
+for note in notes:
+    st.write(note)
