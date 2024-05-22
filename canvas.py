@@ -18,6 +18,10 @@ def load_notes():
         notes = []
     return notes
 
+# 메모 삭제 함수
+def delete_note():
+    open(notes_file, 'w').close()
+
 # Streamlit 앱 설정
 st.title("Notepad")
 
@@ -25,12 +29,23 @@ st.title("Notepad")
 note = st.text_area("Write your note here...", height=150)
 
 if st.button("Save Note"):
-    save_note(note)
-    st.success("Note saved!")
+    if note:
+        save_note(note)
+        st.success("Note saved!")
+    else:
+        st.error("Please write a note before saving.")
+
+# 삭제 버튼
+if st.button("Delete All Notes"):
+    delete_note()
+    st.warning("All notes deleted!")
 
 # 저장된 메모 불러오기
 notes = load_notes()
 
 st.subheader("Notes")
-for note in notes:
-    st.write(note)
+if notes:
+    for note in notes:
+        st.write(note)
+else:
+    st.write("No notes yet.")
